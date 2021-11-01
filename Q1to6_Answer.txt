@@ -1,0 +1,654 @@
+QUES1: Countries with Upper middle income::
+
+mysql> select * from incomeLevel;
++----------------+----------------------+---------------------+-----------------------+
+| incomeLevel.id | incomeLevel.iso2code | incomeLevel.value   | incomeLevel.valueCode |
++----------------+----------------------+---------------------+-----------------------+
+| HIC            | XD                   | High income         |                     5 |
+| NA             | NA                   | Aggregates          |                     0 |
+| LIC            | XM                   | Low income          |                     2 |
+| LMC            | XN                   | Lower middle income |                     3 |
+| UMC            | XT                   | Upper middle income |                     4 |
+| INX            | XY                   | Not classified      |                     0 |
++----------------+----------------------+---------------------+-----------------------+
+6 rows in set (0.00 sec)
+
+mysql> select name from countries where `incomeLevel.id`='HIC';
++---------------------------+
+| name                      |
++---------------------------+
+| Aruba                     |
+| Andorra                   |
+| United Arab Emirates      |
+| Antigua and Barbuda       |
+| Australia                 |
+| Austria                   |
+| Belgium                   |
+| Bahrain                   |
+| Bahamas, The              |
+| Bermuda                   |
+| Barbados                  |
+| Brunei Darussalam         |
+| Canada                    |
+| Switzerland               |
+| Channel Islands           |
+| Chile                     |
+| Curacao                   |
+| Cayman Islands            |
+| Cyprus                    |
+| Czech Republic            |
+| Germany                   |
+| Denmark                   |
+| Spain                     |
+| Estonia                   |
+| Finland                   |
+| France                    |
+| Faroe Islands             |
+| United Kingdom            |
+| Gibraltar                 |
+| Greece                    |
+| Greenland                 |
+| Guam                      |
+| Hong Kong SAR, China      |
+| Croatia                   |
+| Hungary                   |
+| Isle of Man               |
+| Ireland                   |
+| Iceland                   |
+| Israel                    |
+| Italy                     |
+| Japan                     |
+| St. Kitts and Nevis       |
+| Korea, Rep.               |
+| Kuwait                    |
+| Liechtenstein             |
+| Lithuania                 |
+| Luxembourg                |
+| Latvia                    |
+| Macao SAR, China          |
+| St. Martin (French part)  |
+| Monaco                    |
+| Malta                     |
+| Northern Mariana Islands  |
+| New Caledonia             |
+| Netherlands               |
+| Norway                    |
+| Nauru                     |
+| New Zealand               |
+| Oman                      |
+| Palau                     |
+| Poland                    |
+| Puerto Rico               |
+| Portugal                  |
+| French Polynesia          |
+| Qatar                     |
+| Saudi Arabia              |
+| Singapore                 |
+| San Marino                |
+| Slovak Republic           |
+| Slovenia                  |
+| Sweden                    |
+| Sint Maarten (Dutch part) |
+| Seychelles                |
+| Turks and Caicos Islands  |
+| Trinidad and Tobago       |
+| Taiwan, China             |
+| Uruguay                   |
+| United States             |
+| British Virgin Islands    |
+| Virgin Islands (U.S.)     |
++---------------------------+
+80 rows in set (0.00 sec)
+
+
+QUES 2: Countries with "Low income" per region
+
+mysql> select * from region;
++-----------+-----------------+----------------------------+
+| region.id | region.iso2code | region.value               |
++-----------+-----------------+----------------------------+
+| LCN       | ZJ              | Latin America & Caribbean  |
+| NA        | NA              | Aggregates                 |
+| SAS       | 8S              | South Asia                 |
+| SSF       | ZG              | Sub-Saharan Africa         |
+| ECS       | Z7              | Europe & Central Asia      |
+| MEA       | ZQ              | Middle East & North Africa |
+| EAS       | Z4              | East Asia & Pacific        |
+| NAC       | XU              | North America              |
++-----------+-----------------+----------------------------+
+8 rows in set (0.00 sec)
+
+
+mysql> select count(name),`region.id` from countries where `incomeLevel.id`='LIC' group by `region.id`;
++-------------+-----------+
+| count(name) | region.id |
++-------------+-----------+
+|           1 | SAS       |
+|          23 | SSF       |
+|           1 | EAS       |
+|           2 | MEA       |
++-------------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> select name,`region.id` from countries where `incomeLevel.id`='LIC' and `region.id`='SSF';
++--------------------------+-----------+
+| name                     | region.id |
++--------------------------+-----------+
+| Burundi                  | SSF       |
+| Burkina Faso             | SSF       |
+| Central African Republic | SSF       |
+| Congo, Dem. Rep.         | SSF       |
+| Eritrea                  | SSF       |
+| Ethiopia                 | SSF       |
+| Guinea                   | SSF       |
+| Gambia, The              | SSF       |
+| Guinea-Bissau            | SSF       |
+| Liberia                  | SSF       |
+| Madagascar               | SSF       |
+| Mali                     | SSF       |
+| Mozambique               | SSF       |
+| Malawi                   | SSF       |
+| Niger                    | SSF       |
+| Rwanda                   | SSF       |
+| Sudan                    | SSF       |
+| Sierra Leone             | SSF       |
+| Somalia                  | SSF       |
+| South Sudan              | SSF       |
+| Chad                     | SSF       |
+| Togo                     | SSF       |
+| Uganda                   | SSF       |
++--------------------------+-----------+
+23 rows in set (0.00 sec)
+
+mysql> select name,`region.id` from countries where `incomeLevel.id`='LIC' and `region.id`='MEA';
++----------------------+-----------+
+| name                 | region.id |
++----------------------+-----------+
+| Syrian Arab Republic | MEA       |
+| Yemen, Rep.          | MEA       |
++----------------------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> select name,`region.id` from countries where `incomeLevel.id`='LIC' and `region.id`='EAS';
++---------------------------+-----------+
+| name                      | region.id |
++---------------------------+-----------+
+| Korea, Dem. People's Rep. | EAS       |
++---------------------------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select name,`region.id` from countries where `incomeLevel.id`='LIC' and `region.id`='SAS';
++-------------+-----------+
+| name        | region.id |
++-------------+-----------+
+| Afghanistan | SAS       |
++-------------+-----------+
+1 row in set (0.00 sec)
+
+QUES 3: region with highest proportion of "High income" countries
+
+mysql> select count(name) as `HIGH_INCOME_COUNTRIES`,`incomeLevel.id`,`region.id` from countries where `incomeLevel.id`='HIC' group by `region.id`;
++-----------------------+----------------+-----------+
+| HIGH_INCOME_COUNTRIES | incomeLevel.id | region.id |
++-----------------------+----------------+-----------+
+|                    16 | HIC            | LCN       |
+|                    37 | HIC            | ECS       |
+|                     8 | HIC            | MEA       |
+|                    15 | HIC            | EAS       |
+|                     3 | HIC            | NAC       |
+|                     1 | HIC            | SSF       |
++-----------------------+----------------+-----------+
+6 rows in set (0.00 sec)
+
+mysql> select count(name) as `TOTAL_COUNTRIES`,`region.id` from countries group by `region.id`;
++-----------------+-----------+
+| TOTAL_COUNTRIES | region.id |
++-----------------+-----------+
+|              42 | LCN       |
+|              81 | NA        |
+|               8 | SAS       |
+|              48 | SSF       |
+|              58 | ECS       |
+|              21 | MEA       |
+|              38 | EAS       |
+|               3 | NAC       |
++-----------------+-----------+
+8 rows in set (0.00 sec)
+mysql> select A.REGION, `HIGH_INCOME_COUNTRIES`,`TOTAL_COUNTRIES`, `HIGH_INCOME_COUNTRIES` / `TOTAL_COUNTRIES` * 100 AS PROPORTION from (select count(name) as `TOTAL_COUNTRIES`,`region.id` AS REGION from countries group by `region.id`) A INNER JOIN (select count(name) as `HIGH_INCOME_COUNTRIES`,`incomeLevel.id`,`region.id` AS REGION from countries where `incomeLevel.id`='HIC' group by `region.id`) b on A.REGION = B.REGION;
++--------+-----------------------+-----------------+------------+
+| REGION | HIGH_INCOME_COUNTRIES | TOTAL_COUNTRIES | PROPORTION |
++--------+-----------------------+-----------------+------------+
+| LCN    |                    16 |              42 |    38.0952 |
+| SSF    |                     1 |              48 |     2.0833 |
+| ECS    |                    37 |              58 |    63.7931 |
+| MEA    |                     8 |              21 |    38.0952 |
+| EAS    |                    15 |              38 |    39.4737 |
+| NAC    |                     3 |               3 |   100.0000 |
++--------+-----------------------+-----------------+------------+
+
+mysql> select `region.id` as REGION,`incomeLevel.id`, count(name) as `HIGH_INCOME_COUNTRIES_COUNT`, count(name) * 100 /(Select count(*) from countries where `incomeLevel.id`='HIC') as PERCENTAGE from countries where `incomeLevel.id`='HIC' group by `region.id`;
++--------+----------------+-----------------------------+------------+
+| REGION | incomeLevel.id | HIGH_INCOME_COUNTRIES_COUNT | PERCENTAGE |
++--------+----------------+-----------------------------+------------+
+| LCN    | HIC            |                          16 |    20.0000 |
+| ECS    | HIC            |                          37 |    46.2500 |
+| MEA    | HIC            |                           8 |    10.0000 |
+| EAS    | HIC            |                          15 |    18.7500 |
+| NAC    | HIC            |                           3 |     3.7500 |
+| SSF    | HIC            |                           1 |     1.2500 |
++--------+----------------+-----------------------------+------------+
+6 rows in set (0.00 sec)
+
+Europe & Central Asia (ECA) is the region with maximum high income category.
+
+QUES 4: 
+
+mysql> select count(*) from ged;
++----------+
+| count(*) |
++----------+
+|      146 |
++----------+
+1 row in set (0.05 sec)
+
+mysql> select * from ged limit 10;
++--------------------------------------------------+--------------+------+------+------+------+------+
+| Country Name                                     | Country Code | 2018 | 2019 | 2020 | 2021 | 2022 |
++--------------------------------------------------+--------------+------+------+------+------+------+
+| Advanced Economies                               | AME          | 2.2  | 1.6  | -5.4 | 3.3  | 3.5  |
+| East Asia and Pacific                            | EAA          | 6.3  | 5.8  | 0.9  | 7.4  | 5.2  |
+| Emerging Markets and Developing Economies (EMDE) | EMD          | 4.3  | 3.6  | -2.6 | 5    | 4.2  |
+| Euro Area                                        | E19          | 1.9  | 1.3  | -7.4 | 3.6  | 4    |
+| Europe and Central Asia                          | ECH          | 3.4  | 2.3  | -2.9 | 3.3  | 3.9  |
+| Latin America and the Caribbean                  | LAP          | 1.9  | 1    | -6.9 | 3.7  | 2.8  |
+| Middle East and North Africa                     | MNH          | 0.5  | 0.1  | -5   | 2.1  | 3.1  |
+| South Asia                                       | SAP          | 6.5  | 4.4  | -6.7 | 3.3  | 3.8  |
+| Sub-Saharan Africa                               | SSP          | 2.6  | 2.4  | -3.7 | 2.7  | 3.3  |
+| World (WBG members)                              | WLT          | 3    | 2.3  | -4.3 | 4    | 3.8  |
++--------------------------------------------------+--------------+------+------+------+------+------+
+10 rows in set (0.00 sec)
+
+mysql> select * from incomeLevel;
++----------------+----------------------+---------------------+-----------------------+
+| incomeLevel.id | incomeLevel.iso2code | incomeLevel.value   | incomeLevel.valueCode |
++----------------+----------------------+---------------------+-----------------------+
+| HIC            | XD                   | High income         |                     5 |
+| NA             | NA                   | Aggregates          |                     0 |
+| LIC            | XM                   | Low income          |                     2 |
+| LMC            | XN                   | Lower middle income |                     3 |
+| UMC            | XT                   | Upper middle income |                     4 |
+| INX            | XY                   | Not classified      |                     0 |
++----------------+----------------------+---------------------+-----------------------+
+6 rows in set (0.00 sec)
+
+mysql> select `Country Code`,name as countryName, (`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,countries.`incomeLevel.id` AS incomeId from ged INNER JOIN countries on ged.`Country Code` = countries.id INNER JOIN incomeLevel B on countries.`incomeLevel.id` = B.`incomeLevel.id` order by B.`incomeLevel.valueCode`,name;
++--------------+--------------------------------+----------------------+----------+
+| Country Code | countryName                    | TOTAL_GDP            | incomeId |
++--------------+--------------------------------+----------------------+----------+
+| AFG          | Afghanistan                    |   5.3999999999999995 | LIC      |
+| BFA          | Burkina Faso                   |                 17.6 | LIC      |
+| BDI          | Burundi                        |                  8.2 | LIC      |
+| CAF          | Central African Republic       |                 14.1 | LIC      |
+| TCD          | Chad                           |                 10.5 | LIC      |
+| COD          | Congo, Dem. Rep.               |                 13.6 | LIC      |
+| ERI          | Eritrea                        |   25.099999999999998 | LIC      |
+| ETH          | Ethiopia                       |                 32.2 | LIC      |
+| GMB          | Gambia, The                    |   19.099999999999998 | LIC      |
+| GIN          | Guinea                         |                 27.7 | LIC      |
+| GNB          | Guinea-Bissau                  |   12.999999999999998 | LIC      |
+| LBR          | Liberia                        |                  3.1 | LIC      |
+| MDG          | Madagascar                     |   12.999999999999998 | LIC      |
+| MWI          | Malawi                         |                 17.1 | LIC      |
+| MLI          | Mali                           |   15.399999999999999 | LIC      |
+| MOZ          | Mozambique                     |                   12 | LIC      |
+| NER          | Niger                          |                 30.7 | LIC      |
+| RWA          | Rwanda                         |                 30.3 | LIC      |
+| SLE          | Sierra Leone                   |   15.299999999999999 | LIC      |
+| SSD          | South Sudan                    |    2.100000000000001 | LIC      |
+| SDN          | Sudan                          |   -7.500000000000002 | LIC      |
+| TGO          | Togo                           |                 17.7 | LIC      |
+| UGA          | Uganda                         |                 24.6 | LIC      |
+| DZA          | Algeria                        |                  1.4 | LMC      |
+| AGO          | Angola                         |                 -2.5 | LMC      |
+| BGD          | Bangladesh                     |                 23.1 | LMC      |
+| BLZ          | Belize                         |  -11.099999999999998 | LMC      |
+| BEN          | Benin                          |                 27.1 | LMC      |
+| BTN          | Bhutan                         |   10.399999999999999 | LMC      |
+| BOL          | Bolivia                        |                  7.1 | LMC      |
+| CPV          | Cabo Verde                     |                 10.7 | LMC      |
+| KHM          | Cambodia                       |                 21.8 | LMC      |
+| CMR          | Cameroon                       |   11.700000000000001 | LMC      |
+| COM          | Comoros                        |                  9.9 | LMC      |
+| COG          | Congo, Rep.                    |                -19.3 | LMC      |
+| CIV          | Cote d'Ivoire                  |                 26.8 | LMC      |
+| DJI          | Djibouti                       |                 29.2 | LMC      |
+| EGY          | Egypt, Arab Rep.               |                   23 | LMC      |
+| SLV          | El Salvador                    |    5.299999999999999 | LMC      |
+| SWZ          | Eswatini                       |                  2.6 | LMC      |
+| GHA          | Ghana                          |                 17.7 | LMC      |
+| HTI          | Haiti                          |  -0.8999999999999999 | LMC      |
+| HND          | Honduras                       |                  4.4 | LMC      |
+| IND          | India                          |                 11.3 | LMC      |
+| IDN          | Indonesia                      |                 17.2 | LMC      |
+| IRN          | Iran, Islamic Rep.             |                -13.3 | LMC      |
+| KEN          | Kenya                          |                 23.3 | LMC      |
+| KGZ          | Kyrgyz Republic                |    8.600000000000001 | LMC      |
+| LAO          | Lao PDR                        |                 20.1 | LMC      |
+| LSO          | Lesotho                        |                  4.5 | LMC      |
+| MRT          | Mauritania                     |   15.900000000000002 | LMC      |
+| MNG          | Mongolia                       |                 16.5 | LMC      |
+| MAR          | Morocco                        |                    7 | LMC      |
+| MMR          | Myanmar                        |                 24.9 | LMC      |
+| NPL          | Nepal                          |                   17 | LMC      |
+| NIC          | Nicaragua                      |  -13.600000000000001 | LMC      |
+| NGA          | Nigeria                        |   2.9000000000000004 | LMC      |
+| PAK          | Pakistan                       |                  8.4 | LMC      |
+| PNG          | Papua New Guinea               |                  9.5 | LMC      |
+| PHL          | Philippines                    |                 16.1 | LMC      |
+| STP          | Sao Tome and Principe          |                  6.2 | LMC      |
+| SEN          | Senegal                        |                 20.1 | LMC      |
+| SLB          | Solomon Islands                |                    7 | LMC      |
+| LKA          | Sri Lanka                      |    4.199999999999999 | LMC      |
+| TJK          | Tajikistan                     |                   26 | LMC      |
+| TZA          | Tanzania                       |                 25.2 | LMC      |
+| TLS          | Timor-Leste                    |                  3.1 | LMC      |
+| TUN          | Tunisia                        |   2.4000000000000004 | LMC      |
+| UKR          | Ukraine                        |    7.199999999999999 | LMC      |
+| UZB          | Uzbekistan                     |                 20.4 | LMC      |
+| VNM          | Vietnam                        |   30.099999999999998 | LMC      |
+| PSE          | West Bank and Gaza             |   -0.600000000000001 | LMC      |
+| ZMB          | Zambia                         |                  5.7 | LMC      |
+| ZWE          | Zimbabwe                       |   -7.300000000000001 | LMC      |
+| ALB          | Albania                        |                  9.1 | UMC      |
+| ARG          | Argentina                      |                 -8.5 | UMC      |
+| ARM          | Armenia                        |                 12.4 | UMC      |
+| AZE          | Azerbaijan                     |                  5.1 | UMC      |
+| BLR          | Belarus                        |   0.8999999999999996 | UMC      |
+| BIH          | Bosnia and Herzegovina         |                  8.7 | UMC      |
+| BWA          | Botswana                       |    8.100000000000001 | UMC      |
+| BRA          | Brazil                         |                  4.2 | UMC      |
+| BGR          | Bulgaria                       |    8.700000000000001 | UMC      |
+| CHN          | China                          |                 27.8 | UMC      |
+| COL          | Colombia                       |                  7.5 | UMC      |
+| CRI          | Costa Rica                     |    6.300000000000001 | UMC      |
+| DMA          | Dominica                       |   3.0999999999999996 | UMC      |
+| DOM          | Dominican Republic             |                 14.6 | UMC      |
+| ECU          | Ecuador                        |                 -3.3 | UMC      |
+| GNQ          | Equatorial Guinea              |                  -25 | UMC      |
+| FJI          | Fiji                           |   -4.800000000000001 | UMC      |
+| GAB          | Gabon                          |                    8 | UMC      |
+| GEO          | Georgia                        |                   14 | UMC      |
+| GRD          | Grenada                        |   2.0999999999999996 | UMC      |
+| GTM          | Guatemala                      |   10.899999999999999 | UMC      |
+| GUY          | Guyana                         |                 44.4 | UMC      |
+| IRQ          | Iraq                           |   3.6000000000000005 | UMC      |
+| JAM          | Jamaica                        | -0.20000000000000018 | UMC      |
+| JOR          | Jordan                         |                  4.2 | UMC      |
+| KAZ          | Kazakhstan                     |                 12.1 | UMC      |
+| XKX          | Kosovo                         |                  7.8 | UMC      |
+| LBN          | Lebanon                        |                  -41 | UMC      |
+| MYS          | Malaysia                       |                 14.7 | UMC      |
+| MDV          | Maldives                       |                 14.6 | UMC      |
+| MUS          | Mauritius                      |    5.999999999999999 | UMC      |
+| MEX          | Mexico                         |  -0.6000000000000001 | UMC      |
+| MDA          | Moldova                        |                  8.2 | UMC      |
+| MNE          | Montenegro                     |    4.299999999999999 | UMC      |
+| NAM          | Namibia                        |  -4.1000000000000005 | UMC      |
+| MKD          | North Macedonia                |                  8.3 | UMC      |
+| PAN          | Panama                         |                  7.2 | UMC      |
+| PRY          | Paraguay                       |                    9 | UMC      |
+| PER          | Peru                           |                  6.3 | UMC      |
+| ROU          | Romania                        |                 11.1 | UMC      |
+| RUS          | Russian Federation             |                  5.4 | UMC      |
+| SRB          | Serbia                         |   13.100000000000001 | UMC      |
+| ZAF          | South Africa                   |                 -1.8 | UMC      |
+| LCA          | St. Lucia                      | -0.39999999999999947 | UMC      |
+| VCT          | St. Vincent and the Grenadines |                  2.6 | UMC      |
+| SUR          | Suriname                       |                -13.6 | UMC      |
+| THA          | Thailand                       |                  8.7 | UMC      |
+| TUR          | Turkey                         |                 13.9 | UMC      |
+| BHR          | Bahrain                        |                  3.1 | HIC      |
+| CHL          | Chile                          |                    6 | HIC      |
+| HRV          | Croatia                        |   6.6000000000000005 | HIC      |
+| HUN          | Hungary                        |   11.899999999999999 | HIC      |
+| JPN          | Japan                          |  0.39999999999999947 | HIC      |
+| KWT          | Kuwait                         |  -2.7000000000000006 | HIC      |
+| OMN          | Oman                           |  -0.9000000000000004 | HIC      |
+| POL          | Poland                         |                 14.3 | HIC      |
+| QAT          | Qatar                          |                    6 | HIC      |
+| SAU          | Saudi Arabia                   |   1.4999999999999996 | HIC      |
+| SYC          | Seychelles                     |  -2.9000000000000012 | HIC      |
+| ARE          | United Arab Emirates           |                    0 | HIC      |
+| USA          | United States                  |    8.399999999999999 | HIC      |
+| URY          | Uruguay                        |                  4.1 | HIC      |
++--------------+--------------------------------+----------------------+----------+
+136 rows in set (0.00 sec)
+
+QUES 5:  percentage difference in value of GDP year-on-year per country
+
+mysql> select `Country Name`,(`2019`-`2018`)*100/`2019` as YEAR1_PERCENT,(`2020`-`2019`)*100/`2020` as YEAR2_PERCENT,(`2021`-`2020`)*100/`2021` as YEAR3_PERCENT,(`2022`-`2021`)*100/`2022` as YEAR4_PERCENT from ged;
++--------------------------------------------------+---------------------+---------------------+---------------------+---------------------+
+| Country Name                                     | YEAR1_PERCENT       | YEAR2_PERCENT       | YEAR3_PERCENT       | YEAR4_PERCENT       |
++--------------------------------------------------+---------------------+---------------------+---------------------+---------------------+
+| Advanced Economies                               |               -37.5 |  129.62962962962962 |   263.6363636363636 |    5.71428571428572 |
+| East Asia and Pacific                            |  -8.620689655172415 |  -544.4444444444443 |   87.83783783783784 | -42.307692307692314 |
+| Emerging Markets and Developing Economies (EMDE) | -19.444444444444436 |  238.46153846153845 |                 152 | -19.047619047619044 |
+| Euro Area                                        |  -46.15384615384614 |  117.56756756756758 |  305.55555555555554 |   9.999999999999998 |
+| Europe and Central Asia                          |  -47.82608695652175 |  179.31034482758616 |  187.87878787878785 |  15.384615384615387 |
+| Latin America and the Caribbean                  |  -89.99999999999999 |   114.4927536231884 |   286.4864864864865 |  -32.14285714285715 |
+| Middle East and North Africa                     |                -400 |  101.99999999999999 |   338.0952380952381 |   32.25806451612903 |
+| South Asia                                       |  -47.72727272727272 |   165.6716417910448 |  303.03030303030306 |  13.157894736842106 |
+| Sub-Saharan Africa                               |  -8.333333333333341 |  164.86486486486487 |    237.037037037037 |  18.181818181818173 |
+| World (WBG members)                              |  -30.43478260869566 |  153.48837209302326 |  207.50000000000003 |  -5.263157894736847 |
+| Afghanistan                                      |   69.23076923076923 |   170.9090909090909 |                 320 |   24.24242424242424 |
+| Albania                                          |  -86.36363636363633 |  132.83582089552237 |  231.37254901960785 | -15.909090909090892 |
+| Algeria                                          | -49.999999999999986 |   112.3076923076923 |   271.0526315789474 |  -80.95238095238093 |
+| Angola                                           | -122.22222222222223 |                77.5 |   544.4444444444445 |   74.28571428571429 |
+| Argentina                                        |  -23.80952380952381 |   80.18867924528303 |   316.3265306122449 |  -157.8947368421053 |
+| Armenia                                          |  31.578947368421048 |                 195 |  358.06451612903226 |   31.11111111111111 |
+| Azerbaijan                                       |  31.818181818181824 |                 144 |  363.15789473684214 |   57.77777777777778 |
+| Bahrain                                          |                   0 |   134.6153846153846 |   336.3636363636363 |  11.999999999999993 |
+| Bangladesh                                       |   3.658536585365841 | -309.99999999999994 | -24.999999999999993 |  52.941176470588225 |
+| Belarus                                          | -158.33333333333334 |                 175 |   40.74074074074074 |                 400 |
+| Belize                                           |  204.99999999999997 |   90.14778325123153 |   394.2028985507247 | -213.63636363636363 |
+| Benin                                            |  2.8985507246376834 | -245.00000000000003 |                  60 |  23.076923076923077 |
+| Bhutan                                           |  11.627906976744187 |  -514.2857142857142 |                 200 |  130.43478260869566 |
+| Bolivia                                          |   -90.9090909090909 |  132.83582089552237 |   271.7948717948718 | -11.428571428571427 |
+| Bosnia and Herzegovina                           |  -37.03703703703704 |               167.5 |  242.85714285714286 |  20.000000000000004 |
+| Botswana                                         |                 -50 |  132.96703296703296 |  259.64912280701753 |  -42.50000000000001 |
+| Brazil                                           | -28.571428571428584 |  131.11111111111111 |                 250 |                 -20 |
+| Bulgaria                                         |  16.216216216216218 |  172.54901960784318 |  254.54545454545453 |   10.81081081081082 |
+| Burkina Faso                                     | -19.298245614035082 |                 385 |  183.33333333333337 |   48.93617021276596 |
+| Burundi                                          |  11.111111111111109 |                -500 |                  85 |                  20 |
+| Cabo Verde                                       |   21.05263157894737 |   151.8181818181818 |                 300 |   8.333333333333334 |
+| Cambodia                                         |  -5.633802816901413 |                 455 |                 150 |   23.07692307692308 |
+| Cameroon                                         | -10.810810810810795 |                 248 |  183.33333333333334 |   11.76470588235294 |
+| Central African Republic                         |  -19.35483870967742 |                NULL |                 100 |   21.95121951219511 |
+| Chad                                             |  25.000000000000007 |                 500 |  133.33333333333334 |   27.27272727272727 |
+| Chile                                            | -254.54545454545453 |  117.46031746031747 |                 250 | -35.483870967741936 |
+| China                                            |  -8.196721311475411 | -204.99999999999997 |   74.68354430379746 |  -51.92307692307692 |
+| Colombia                                         |   24.24242424242424 |                 144 |   253.0612244897959 | -13.953488372093037 |
+| Comoros                                          |  -78.94736842105263 |  235.71428571428572 |  158.33333333333334 |  33.333333333333336 |
+| Congo Dem. Rep.                                  | -31.818181818181802 |   358.8235294117647 |  180.95238095238093 |  29.999999999999996 |
+| Congo Rep.                                       |  -77.14285714285714 |  60.674157303370784 |                -345 |  253.84615384615384 |
+| Costa Rica                                       | -28.571428571428573 |              143.75 |   284.6153846153846 |  29.729729729729733 |
+| Cote d'Ivoire                                    |  1.4492753623188481 | -283.33333333333337 |   67.27272727272727 |   5.172413793103446 |
+| Croatia                                          |   6.896551724137922 |  133.72093023255815 |  259.25925925925924 | -28.571428571428573 |
+| Djibouti                                         | -12.000000000000004 |                 850 |  114.08450704225352 |  1.3888888888888962 |
+| Dominica                                         |   94.18604651162791 |  186.00000000000003 |                1100 |   66.66666666666667 |
+| Dominican Republic                               |                 -40 |  174.62686567164178 |  239.58333333333334 | -6.6666666666666625 |
+| Ecuador                                          |               -1200 |  101.05263157894737 |  371.42857142857144 | -169.23076923076925 |
+| Egypt Arab Rep.                                  |   5.357142857142854 | -55.555555555555536 |  -33.33333333333333 |   53.44827586206896 |
+| El Salvador                                      |                   0 |  133.33333333333334 |   256.5217391304348 |  -48.38709677419353 |
+| Equatorial Guinea                                | -14.285714285714299 |  37.777777777777786 | -221.42857142857144 | -133.33333333333334 |
+| Eritrea                                          | -251.35135135135138 |   716.6666666666667 |  117.14285714285712 |   36.36363636363637 |
+| Ethiopia                                         |  6.6666666666666625 |  -47.54098360655739 |                NULL |                 100 |
+| Fiji                                             |                1050 |   97.89473684210527 |   830.7692307692307 |   68.29268292682927 |
+| Gabon                                            |   79.48717948717947 |               262.5 |  226.31578947368422 |                  50 |
+| Gambia The                                       |  -8.333333333333334 |   433.3333333333333 |  158.06451612903228 |   41.50943396226415 |
+| Georgia                                          |   3.921568627450967 |                 185 |                 250 |  33.333333333333336 |
+| Ghana                                            |  3.0769230769230798 |  -490.9090909090909 |  21.428571428571416 |   41.66666666666667 |
+| Grenada                                          | -104.99999999999999 |  116.66666666666667 |                 500 |                  40 |
+| Guatemala                                        |  15.789473684210519 |  208.57142857142858 |  197.22222222222223 |  5.2631578947368345 |
+| Guinea                                           | -10.714285714285726 |  -7.692307692307681 |  5.4545454545454515 |  -5.769230769230766 |
+| Guinea-Bissau                                    |  17.391304347826086 |   291.6666666666667 |                 180 |                  25 |
+| Guyana                                           |   18.51851851851852 |   76.72413793103448 |  -197.4358974358974 | -116.66666666666664 |
+| Haiti                                            |                 200 |  55.263157894736835 |   371.4285714285714 |   6.666666666666672 |
+| Honduras                                         |  -37.03703703703704 |  127.83505154639174 |   355.2631578947369 |  2.5641025641025665 |
+| Hungary                                          | -10.869565217391305 |  177.96610169491524 |  255.26315789473682 |  11.627906976744187 |
+| India                                            |  -45.23809523809522 |              143.75 |  277.77777777777777 | -3.8461538461538494 |
+| Indonesia                                        | -4.0000000000000036 |  327.27272727272725 |                 150 |   8.333333333333321 |
+| Iran Islamic Rep.                                |   11.76470588235294 |  -83.78378378378376 |   346.6666666666667 |   11.76470588235294 |
+| Iraq                                             |  113.63636363636363 |  146.31578947368422 |                 575 |    72.6027397260274 |
+| Jamaica                                          | -111.11111111111109 |                 110 |                 325 |                -100 |
+| Japan                                            |                -100 |  105.66037735849056 |                 312 |  -8.695652173913052 |
+| Jordan                                           |   5.000000000000004 |  157.14285714285714 |  294.44444444444446 |   9.999999999999998 |
+| Kazakhstan                                       |   8.888888888888896 |                 280 |                 200 |  28.571428571428573 |
+| Kenya                                            | -16.666666666666654 |                 640 |   114.4927536231884 |  -21.05263157894737 |
+| Kosovo                                           |   9.523809523809533 |  147.72727272727272 |   337.8378378378378 |   24.48979591836735 |
+| Kuwait                                           |                -200 |  105.06329113924052 |                1680 |   83.87096774193549 |
+| Kyrgyz Republic                                  |  15.555555555555559 |              156.25 |   310.5263157894737 |  15.555555555555559 |
+| Lao PDR                                          | -34.042553191489354 |   883.3333333333334 |  112.24489795918366 | -2.0833333333333446 |
+| Lebanon                                          |   71.64179104477613 |   65.10416666666667 |  -45.45454545454546 |                NULL |
+| Lesotho                                          | -7.1428571428571495 |  126.41509433962263 |  270.96774193548384 |   18.42105263157894 |
+| Liberia                                          |  152.17391304347828 |  20.689655172413797 |             190.625 |  17.948717948717942 |
+| Macedonia FYR                                    |  24.999999999999996 |  170.58823529411762 |  241.66666666666663 |   -2.85714285714286 |
+| Madagascar                                       |  4.1666666666666705 |  214.28571428571428 |                 310 |   65.51724137931035 |
+| Malawi                                           |  27.272727272727273 |  -238.4615384615385 |    60.6060606060606 |  32.653061224489804 |
+| Malaysia                                         |  -9.302325581395358 |  174.13793103448276 |  186.56716417910448 |  -39.58333333333334 |
+| Maldives                                         |  -15.71428571428571 |   132.5581395348837 |   326.3157894736842 |  17.391304347826086 |
+| Mali                                             |  5.9999999999999964 |                 350 |                 180 |   51.92307692307692 |
+| Mauritania                                       |   64.40677966101694 |  1083.3333333333335 |  116.21621621621621 |   22.91666666666666 |
+| Mauritius                                        |  -26.66666666666666 |  123.25581395348837 |  343.39622641509436 |  22.058823529411764 |
+| Mexico                                           |                2300 |   98.88888888888889 |   343.2432432432432 | -42.307692307692314 |
+| Moldova                                          | -19.444444444444436 |                 150 |  289.47368421052636 |  -2.702702702702693 |
+| Mongolia                                         |                 -40 |  196.15384615384613 |  220.93023255813955 |   20.37037037037038 |
+| Montenegro                                       | -24.390243902439025 |  127.51677852348993 |  344.26229508196724 |   -56.4102564102564 |
+| Morocco                                          | -24.000000000000004 |   139.6825396825397 |               257.5 |  -8.108108108108103 |
+| Mozambique                                       | -54.545454545454525 |                 375 |  128.57142857142856 |  36.363636363636374 |
+| Myanmar                                          |   5.882352941176462 |                -300 |  15.000000000000002 |                  75 |
+| Namibia                                          |  163.63636363636363 |   86.07594936708861 |   459.0909090909091 | -10.000000000000009 |
+| Nepal                                            |   4.285714285714283 |               -3400 |   66.66666666666667 |                  76 |
+| Nicaragua                                        | -2.5641025641025665 |                  35 |  -566.6666666666666 |                 175 |
+| Niger                                            | -20.689655172413797 |                -480 |    80.3921568627451 |  56.779661016949156 |
+| Nigeria                                          |  13.636363636363647 |  153.65853658536588 |   472.7272727272726 |  38.888888888888886 |
+| Oman                                             |  212.50000000000003 |   91.48936170212765 |                1980 |   93.67088607594937 |
+| Pakistan                                         | -189.47368421052633 |  226.66666666666666 |                 400 |                  75 |
+| Panama                                           |  -23.33333333333334 |  137.03703703703704 |   258.8235294117647 |  -45.71428571428571 |
+| Papua New Guinea                                 |  105.08474576271186 |  255.26315789473682 |  208.57142857142858 |  16.666666666666668 |
+| Paraguay                                         |                 900 |   63.63636363636363 |  133.33333333333337 |  17.500000000000004 |
+| Peru                                             |   -81.8181818181818 |  118.33333333333333 |   257.8947368421053 |  -68.88888888888887 |
+| Philippines                                      |  -4.999999999999997 |  174.07407407407408 |  237.28813559322032 |  1.6666666666666607 |
+| Poland                                           | -20.000000000000007 |   232.3529411764706 |  197.14285714285714 |  18.604651162790695 |
+| Qatar                                            | -49.999999999999986 |                 140 |  166.66666666666666 |                   0 |
+| Romania                                          |  -7.317073170731725 |                 182 |  242.85714285714286 |  14.634146341463408 |
+| Russia                                           |   -92.3076923076923 |               132.5 |  253.84615384615384 |   13.33333333333333 |
+| Rwanda                                           |   8.510638297872347 |                4800 |  103.50877192982456 |   16.17647058823529 |
+| Sao Tome and Principe                            | -123.07692307692307 |                 120 |   316.6666666666667 |   45.45454545454545 |
+| Saudi Arabia                                     |                -700 |  105.55555555555554 |                 370 |   9.090909090909099 |
+| Senegal                                          | -20.754716981132088 |   857.1428571428572 |                 120 |                37.5 |
+| Serbia                                           |  -4.761904761904766 |                 310 |  164.51612903225805 |   8.823529411764701 |
+| Seychelles                                       | -104.99999999999999 |  112.57861635220124 |   612.9032258064516 |   18.42105263157894 |
+| Sierra Leone                                     |   38.18181818181818 |  339.13043478260875 |  156.09756097560978 |  10.869565217391305 |
+| Solomon Islands                                  |                -225 |                 125 |                 250 |   8.571428571428566 |
+| South Africa                                     |                -300 |  102.56410256410257 |   336.3636363636364 |  -94.11764705882354 |
+| Sri Lanka                                        |  -43.47826086956522 |  134.32835820895522 |  303.03030303030306 |  -64.99999999999999 |
+| St. Lucia                                        | -52.941176470588246 |  109.44444444444444 |  322.22222222222223 |  -55.76923076923076 |
+| St. Vincent and the Grenadines                   | -450.00000000000006 |                 108 |                NULL |                 100 |
+| Sudan                                            |   8.000000000000007 |   69.87951807228916 |                 432 |   19.35483870967742 |
+| Suriname                                         |  -766.6666666666667 |  102.29007633587787 |  -589.4736842105264 |  -26.66666666666666 |
+| Swaziland                                        |   -84.6153846153846 |  137.14285714285714 |   333.3333333333333 |  -66.66666666666667 |
+| Tajikistan                                       |   2.666666666666669 | -240.90909090909088 |   37.14285714285713 |   36.36363636363637 |
+| Tanzania                                         |   6.896551724137922 |                -132 |   54.54545454545455 |   8.333333333333334 |
+| Thailand                                         |  -70.83333333333333 |  136.92307692307693 |               262.5 |  14.893617021276599 |
+| Timor-Leste                                      |  123.52941176470588 |                 150 |  319.35483870967744 |  26.190476190476193 |
+| Togo                                             |   7.547169811320744 |                NULL |                 100 |  33.333333333333336 |
+| Tunisia                                          | -170.00000000000003 |  110.98901098901099 |   256.8965517241379 |                -190 |
+| Turkey                                           | -233.33333333333331 |                 -80 |   88.88888888888889 |                  10 |
+| Uganda                                           |   8.823529411764701 | -134.48275862068965 | -3.5714285714285747 |   52.54237288135594 |
+| Ukraine                                          |  -6.249999999999991 |  158.18181818181816 |   283.3333333333333 |   3.225806451612906 |
+| United Arab Emirates                             |  29.411764705882355 |  126.98412698412699 |                 730 |  58.333333333333336 |
+| United States                                    |  -36.36363636363635 |  161.11111111111114 |  202.85714285714286 |  -6.060606060606066 |
+| Uruguay                                          |                -700 |  104.65116279069768 |   226.4705882352941 |  -6.249999999999991 |
+| Uzbekistan                                       |   3.571428571428559 |  -833.3333333333334 |   86.04651162790698 |   4.444444444444448 |
+| Vietnam                                          | -1.4285714285714235 |                -150 |    58.2089552238806 | -3.0769230769230798 |
+| West Bank and Gaza                               |  14.285714285714285 |  117.72151898734178 |   443.4782608695652 |  4.1666666666666705 |
+| Zambia                                           |                -150 |  131.11111111111111 |   336.8421052631579 |   44.11764705882353 |
+| Zimbabwe                                         |  159.25925925925924 |  19.000000000000004 |  444.82758620689657 |   6.451612903225812 |
+| South Sudan                                      | -1066.6666666666667 |  103.22580645161291 |   373.5294117647059 |                NULL |
++--------------------------------------------------+---------------------+---------------------+---------------------+---------------------+
+146 rows in set (0.00 sec)
+
+
+QUES 6:  3 countries with lowest GDP per region.
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'LCN' order by total_gdp limit 3;
++--------------+---------------------+-----------+
+| Country Name | TOTAL_GDP           | region.id |
++--------------+---------------------+-----------+
+| Nicaragua    | -13.600000000000001 | LCN       |
+| Suriname     |               -13.6 | LCN       |
+| Belize       | -11.099999999999998 | LCN       |
++--------------+---------------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'SAS' order by total_gdp limit 3;
++--------------+--------------------+-----------+
+| Country Name | TOTAL_GDP          | region.id |
++--------------+--------------------+-----------+
+| Sri Lanka    |  4.199999999999999 | SAS       |
+| Afghanistan  | 5.3999999999999995 | SAS       |
+| Pakistan     |                8.4 | SAS       |
++--------------+--------------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'SSF' order by total_gdp limit 3;
++-------------------+--------------------+-----------+
+| Country Name      | TOTAL_GDP          | region.id |
++-------------------+--------------------+-----------+
+| Equatorial Guinea |                -25 | SSF       |
+| Congo Rep.        |              -19.3 | SSF       |
+| Sudan             | -7.500000000000002 | SSF       |
++-------------------+--------------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'ECS' order by total_gdp limit 3;
++--------------+--------------------+-----------+
+| Country Name | TOTAL_GDP          | region.id |
++--------------+--------------------+-----------+
+| Belarus      | 0.8999999999999996 | ECS       |
+| Montenegro   |  4.299999999999999 | ECS       |
+| Azerbaijan   |                5.1 | ECS       |
++--------------+--------------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'MEA' order by total_gdp limit 3;
++-------------------+---------------------+-----------+
+| Country Name      | TOTAL_GDP           | region.id |
++-------------------+---------------------+-----------+
+| Lebanon           |                 -41 | MEA       |
+| Iran Islamic Rep. |               -13.3 | MEA       |
+| Kuwait            | -2.7000000000000006 | MEA       |
++-------------------+---------------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'EAS' order by total_gdp limit 3;
++--------------+---------------------+-----------+
+| Country Name | TOTAL_GDP           | region.id |
++--------------+---------------------+-----------+
+| Fiji         |  -4.800000000000001 | EAS       |
+| Japan        | 0.39999999999999947 | EAS       |
+| Timor-Leste  |                 3.1 | EAS       |
++--------------+---------------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select `Country Name`,(`2018`+`2019`+`2020`+`2021`+`2022`) AS TOTAL_GDP,`region.id` from ged INNER JOIN countries on ged.`Country Code` = countries.id where `region.id` = 'NAC' order by total_gdp limit 3;
++---------------+-------------------+-----------+
+| Country Name  | TOTAL_GDP         | region.id |
++---------------+-------------------+-----------+
+| United States | 8.399999999999999 | NAC       |
++---------------+-------------------+-----------+
+1 row in set (0.00 sec)
+
+
+
